@@ -1,1 +1,36 @@
+name: Deploy Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 支持手动点按钮重新部署
+
+# 解决无限排队的核心权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 避免多次推送排队冲突
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v4
+
+      - name: 配置Pages
+        uses: actions/configure-pages@v4
+
+      - name: 上传全部静态文件（你的index.html直接在根目录）
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: 部署Pages
+        uses: actions/deploy-pages@v5
 
